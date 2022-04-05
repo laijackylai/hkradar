@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+message Position {
+    int32 longitude = 1;
+    int32 latitude = 2;
+    int32 height = 3;
+}
+
+message Color {
+    int32 r = 1;
+    int32 g = 2;
+    int32 b = 3;
+}
+
+message Dp {
+    Position position = 1;
+    int32 reflectivity = 2;
+    Color color = 3;
+}
+
+message Data {
+    repeated Dp Data = 1;
+}
