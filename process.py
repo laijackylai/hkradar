@@ -1,6 +1,9 @@
 from datetime import datetime
 import Nio
 import numpy as np
+import os
+import multiprocessing
+from multiprocessing import Pool
 # import json
 # import compress_json
 # import msgpack
@@ -9,12 +12,16 @@ import numpy as np
 from plyfile import PlyData, PlyElement
 
 TEST_DIR = './test/'
+HAIL_DIR = './20210916/'
 
 
-def main():
+def process(file):
     """
     process nc
     """
+
+    name = file.split('/')[3].split('.')[0]
+
     f64 = TEST_DIR + '64.nc'
     f256 = TEST_DIR + '256.nc'
 
@@ -23,8 +30,8 @@ def main():
     lat = grid64[480:960][:]
     # grid256 = './TMS_256grid.csv'
 
-    f = Nio.open_file(f64, 'r')
-    vars = list(f.variables.keys())
+    f = Nio.open_file(file, 'r')
+    # vars = list(f.variables.keys())
     # * ['time', 'height', 'y', 'x', '__xarray_dataarray_variable__']
 
     time = f.variables['time']
@@ -103,8 +110,9 @@ def main():
 
     el = PlyElement.describe(ply_data, 'vertex', comments=[
         'contains radar CAPPI data', 'format in ((lon, lat, height), (r, g, b), (dBZ, dBZ, dBZ))'])
-    PlyData([el]).write(TEST_DIR + 'data.ply')
-    PlyData([el], text=True).write(TEST_DIR + 'data_ascii.ply')
+    PlyData([el]).write(HAIL_DIR + name + '.ply')
+    PlyData([el], text=True).write(HAIL_DIR + name + '_ascii' + '.ply')
+    print(name)
 
     # * save ply
     # coord_el = PlyElement.describe(coord_data, 'coordinates', comments=[
@@ -129,8 +137,6 @@ def main():
 
     # with open(TEST_DIR + 'test.json', 'w') as test:
     #     test.write(write_string)
-
-    print('done')
 
 
 def getColor(dBZ):
@@ -190,6 +196,17 @@ def getColor(dBZ):
 
 if __name__ == '__main__':
     start = datetime.now()
-    main()
+    list = []
+    for subdir, dirs, files in os.walk(HAIL_DIR):
+        for file in files:
+            # print os.path.join(subdir, file)
+            filepath = subdir + os.sep + file
+
+            if filepath.endswith(".nc"):
+                list.append(filepath)
+
+    with Pool(multiprocessing.cpu_count()) as p:
+        p.map(process, list)
+
     end = datetime.now()
     print('time used: ', start - end)
