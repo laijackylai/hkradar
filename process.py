@@ -13,6 +13,7 @@ from plyfile import PlyData, PlyElement
 
 TEST_DIR = './test/'
 HAIL_DIR = './20210916/'
+NORMAL_DIR = './20220322/'
 
 
 def process(file):
@@ -109,9 +110,9 @@ def process(file):
     #     color_data, dtype=[('r', 'u1'), ('g', 'u1'), ('b', 'u1')])
 
     el = PlyElement.describe(ply_data, 'vertex', comments=[
-        'contains radar CAPPI data', 'format in ((lon, lat, height), (r, g, b), (dBZ, dBZ, dBZ))'])
-    PlyData([el]).write(HAIL_DIR + name + '.ply')
-    PlyData([el], text=True).write(HAIL_DIR + name + '_ascii' + '.ply')
+        'contains radar CAPPI data', 'format in ((lon, lat, height), (r, g, b), (dBZ, dBZ))'])
+    PlyData([el]).write(NORMAL_DIR + name + '.ply')
+    PlyData([el], text=True).write(NORMAL_DIR + name + '_ascii' + '.ply')
     print(name)
 
     # * save ply
@@ -197,7 +198,7 @@ def getColor(dBZ):
 if __name__ == '__main__':
     start = datetime.now()
     list = []
-    for subdir, dirs, files in os.walk(HAIL_DIR):
+    for subdir, dirs, files in os.walk(NORMAL_DIR):
         for file in files:
             # print os.path.join(subdir, file)
             filepath = subdir + os.sep + file
